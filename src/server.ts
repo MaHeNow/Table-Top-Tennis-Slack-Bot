@@ -5,6 +5,7 @@ import { SlackController } from './controller/slack.controller';
 import { createMessageAdapter, SlackMessageAdapter } from '@slack/interactive-messages';
 import { dataSource } from "./data-source"
 import { Match } from './database/entities/match.entity';
+import { slackClient } from './slack.client'
 require("dotenv").config();
 
 
@@ -68,6 +69,36 @@ class Server {
                 const match = await dataSource.getRepository(Match).create(matchData);
                 const result = await dataSource.getRepository(Match).save(match);
                 console.log('Match added to database result: ', result);
+
+                let message = "";
+
+                if (first_player_score !== second_player_score) {
+                    let first_player_won = first_player_score > second_player_score;
+                    let winner = first_player_won ? first_player : second_player;
+                    let looser = first_player_won ? second_player : first_player;
+                    let winner_score = first_player_won ? first_player_score : second_player_score;
+                    let looser_score = first_player_won ? second_player_score : first_player_score;
+
+                    message = `<@${winner}> hat ${winner_score}:${looser_score} gegen <@${looser}> gewonnen :clown_face: :100: :fire: Damn...`;
+                    console.log(message);
+                } else {
+                    message = `<@${first_player}> und <@${second_player}> haben unentschieden gespielt. ${first_player_score}:${second_player_score}`;
+                }
+
+                slackClient.chat.postMessage({
+                    channel: '#tischtennis',
+                    text: "Message after match submit.",
+                    link_names: true,
+                    blocks: [
+                        {
+                            "type": "section",
+                            "text": {
+                                "type": "mrkdwn",
+                                "text": message,
+                            }
+                        }            
+                    ]
+                });
             }
 
             respond({
