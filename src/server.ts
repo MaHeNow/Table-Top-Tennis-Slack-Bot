@@ -1,6 +1,6 @@
 import express from 'express';
 import bodyParser from 'body-parser';
-import { MatchController } from './controller/match.controller';
+import { RankingController } from './controller/ranking.controller';
 import { SlackController } from './controller/slack.controller';
 import { SlackMessageAdapter } from '@slack/interactive-messages';
 import { dataSource } from "./data-source"
@@ -12,7 +12,7 @@ require("dotenv").config();
 class Server {
 
     private app: express.Application;
-    private matchController: MatchController;
+    private rankingController: RankingController;
     private slackController: SlackController;
     private slackMessageAdapter: SlackMessageAdapter;
 
@@ -26,10 +26,12 @@ class Server {
         this.slackMessageAdapter = slackMessageAdapter;
         
         this.app.use('/api/interactive_message/', this.slackMessageAdapter.requestListener());
+
+        // needed to use the request body in functions called by an endpoint
         this.app.use(bodyParser.urlencoded({ extended: false }));
         this.app.use(bodyParser.json());
 
-        this.matchController = new MatchController();
+        this.rankingController = new RankingController();
         this.slackController = new SlackController();
         this.routes();
 
@@ -47,6 +49,7 @@ class Server {
     }
 
     public async routes() {
+        this.app.use('/api/ranking/', this.rankingController.router);
         this.app.use('/api/slack/', this.slackController.router);
     }
 
