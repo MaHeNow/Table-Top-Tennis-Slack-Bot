@@ -4,6 +4,7 @@ import { MatchController } from './controller/match.controller';
 import { SlackController } from './controller/slack.controller';
 import { createMessageAdapter, SlackMessageAdapter } from '@slack/interactive-messages';
 import { dataSource } from "./data-source"
+import { Match } from './database/entities/match.entity';
 require("dotenv").config();
 
 
@@ -39,14 +40,14 @@ class Server {
     }
 
     public configureSlackMessageAdapter() {
-        this.slackMessageAdapter.action({actionId: "submit_button"}, (payload, respond) => {
+        this.slackMessageAdapter.action({actionId: "submit_button"}, async (payload, respond) => {
 
             let values = payload.state.values;
 
             let first_player: string = values.player_1_section['first_player_select-action'].selected_user;
-            let first_player_score: string = values.player_1_score['first_player_score-action'].value;
+            let first_player_score: number = parseInt(values.player_1_score['first_player_score-action'].value);
             let second_player: string = values.player_2_section['second_player_select-action'].selected_user;
-            let second_player_score: string = values.player_2_score['second_player_score-action'].value;
+            let second_player_score: number = parseInt(values.player_2_score['second_player_score-action'].value);
             let match_date: string = values.date_section.match_date.selected_date;
             
             console.log(first_player);
@@ -54,6 +55,20 @@ class Server {
             console.log(second_player);
             console.log(second_player_score);
             console.log(match_date);
+
+            if (first_player_score !== NaN && second_player_score !== NaN) {
+                const matchData = {
+                    date: match_date,
+                    player1ID: first_player,
+                    player2ID: second_player,
+                    player1Score: first_player_score,
+                    player2Score: second_player_score
+                }
+
+                const match = await dataSource.getRepository(Match).create(matchData);
+                const result = await dataSource.getRepository(Match).save(match);
+                console.log('Match added to database result: ', result);
+            }
 
             respond({
                 'response_type': 'ephemeral',
@@ -86,8 +101,10 @@ class Server {
 
     public async routes() {
 
+        // TODO: Most likely not needed
         this.app.use('/api/matches/', this.matchController.router);
         this.app.use('/api/slack/', this.slackController.router);
+        // TODO: Remove This
         this.app.get("/", (req: Request, res: Response) => {
             res.send("Hello World");
         });
