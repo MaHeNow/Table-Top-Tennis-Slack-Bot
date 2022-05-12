@@ -15,6 +15,7 @@ export class SlackController {
     public requestMatchLogging(req: Request, res: Response) {
         
         let userID: string = req.body.user_id;
+        let currentDate = new Date();
 
         slackClient.chat.postEphemeral({
             channel: '#tischtennis',
@@ -31,7 +32,7 @@ export class SlackController {
                     "accessory": {
                         "type": "datepicker",
                         "action_id": "match_date",
-                        "initial_date": "2022-05-11", // TODO: fetch current day
+                        "initial_date": `${currentDate.getFullYear}-${currentDate.getMonth}-${currentDate.getDay}`,
                         "placeholder": {
                             "type": "plain_text",
                             "text": "Wähle ein Datum aus"
