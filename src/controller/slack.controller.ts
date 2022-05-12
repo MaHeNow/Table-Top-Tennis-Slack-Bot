@@ -1,5 +1,5 @@
 import { Router, Response, Request } from "express";
-import { WebClient } from "@slack/web-api";
+import { slackClient } from "../slack.client";
 
 export class SlackController {
     
@@ -14,8 +14,6 @@ export class SlackController {
         
         let userID: string = req.body.user_id;
 
-        let slackClient: WebClient = new WebClient(process.env.SLACK_BOT_TOKEN);
-        
         slackClient.chat.postEphemeral({
             channel: '#tischtennis',
             text: "Submit Match",
