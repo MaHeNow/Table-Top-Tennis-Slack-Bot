@@ -5,6 +5,7 @@ import { SlackController } from './controller/slack.controller';
 import { SlackMessageAdapter } from '@slack/interactive-messages';
 import { dataSource } from "./data-source"
 import { slackMessageAdapter } from './slack.message.adapter';
+import { initializeScheduledJobs } from './scheduled.jos';
 require("dotenv").config();
 
 
@@ -19,7 +20,9 @@ class Server {
         this.app = express();
 
         this.configuration();
-        
+
+        initializeScheduledJobs();
+    
         this.slackMessageAdapter = slackMessageAdapter;
         
         this.app.use('/api/interactive_message/', this.slackMessageAdapter.requestListener());
