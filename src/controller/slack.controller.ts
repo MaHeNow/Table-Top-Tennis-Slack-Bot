@@ -1,5 +1,6 @@
 import { Router, Response, Request } from "express";
 import { slackClient } from "../slack.client";
+import { postRankingMessage } from "../utils";
 
 export class SlackController {
     
@@ -10,7 +11,8 @@ export class SlackController {
         this.routes();
     }
     
-    public ping(req: Request, res: Response) {
+
+    public requestMatchLogging(req: Request, res: Response) {
         
         let userID: string = req.body.user_id;
 
@@ -131,8 +133,17 @@ export class SlackController {
         res.send();
     }
 
+
+    public async requestRanking(req: Request, resp: Response) {
+        
+        await postRankingMessage();
+        resp.send();
+    }
+
+
     public routes() {
-        this.router.post('/', this.ping);
+        this.router.post('/requestLogging', this.requestMatchLogging);
+        this.router.post('/requestRanking', this.requestRanking);
     }
 
 }

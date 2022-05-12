@@ -131,14 +131,7 @@ class Server {
     }
 
     public async routes() {
-
-        // TODO: Most likely not needed
-        this.app.use('/api/matches/', this.matchController.router);
         this.app.use('/api/slack/', this.slackController.router);
-        // TODO: Remove This
-        this.app.get("/", (req: Request, res: Response) => {
-            res.send("Hello World");
-        });
     }
 
     public start() {
