@@ -1,5 +1,4 @@
 import { Router, Response, Request } from "express";
-import { MatchEntity } from "../database/entities/match.entity";
 
 export class MatchController {
     

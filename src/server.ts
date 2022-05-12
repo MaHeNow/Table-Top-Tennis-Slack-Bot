@@ -3,7 +3,7 @@ import bodyParser from 'body-parser';
 import { MatchController } from './controller/match.controller';
 import { SlackController } from './controller/slack.controller';
 import { createMessageAdapter, SlackMessageAdapter } from '@slack/interactive-messages';
-import { createConnection, DataSource } from 'typeorm';
+import { dataSource } from "./data-source"
 require("dotenv").config();
 
 
@@ -12,15 +12,7 @@ class Server {
     private app: express.Application;
     private matchController: MatchController;
     private slackController: SlackController;
-    private slackMessageAdapter: SlackMessageAdapter; 
-    public dataSource: DataSource = new DataSource({
-        type: "postgres",
-        host: "172.17.0.2",
-        port: 5432,
-        username: "ttranking",
-        password: "ttranking",
-        database: "ttranking"
-    });
+    private slackMessageAdapter: SlackMessageAdapter;
 
     constructor() {
         this.app = express();
@@ -37,9 +29,9 @@ class Server {
         this.slackController = new SlackController();
         this.routes();
 
-        this.dataSource.initialize()
+        dataSource.initialize()
             .then(() => {
-                console.log("Data Source has been initialized");
+                console.log("Data Source has been initialized.");
             })
             .catch((err) => {
                 console.log(err)
