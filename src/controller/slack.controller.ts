@@ -16,6 +16,8 @@ export class SlackController {
         
         let userID: string = req.body.user_id;
         let currentDate = new Date();
+        // transforms the date into a string with the format yyyy-mm-dd
+        let dateString = currentDate.toISOString().split('T')[0];
 
         slackClient.chat.postEphemeral({
             channel: '#tischtennis',
@@ -32,7 +34,7 @@ export class SlackController {
                     "accessory": {
                         "type": "datepicker",
                         "action_id": "match_date",
-                        "initial_date": `${currentDate.getFullYear}-${currentDate.getMonth}-${currentDate.getDay}`,
+                        "initial_date": dateString,
                         "placeholder": {
                             "type": "plain_text",
                             "text": "Wähle ein Datum aus"
@@ -136,7 +138,6 @@ export class SlackController {
 
 
     public async requestRanking(req: Request, resp: Response) {
-        
         await postRankingMessage();
         resp.send();
     }
