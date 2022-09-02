@@ -2,7 +2,6 @@ import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()
 export class Match {
-
     @PrimaryGeneratedColumn()
     id: number;
 
@@ -20,5 +19,4 @@ export class Match {
 
     @Column()
     player2Score: number;
-    
 }
