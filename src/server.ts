@@ -8,7 +8,6 @@ import { slackMessageAdapter } from './slack.message.adapter';
 import { initializeScheduledJobs } from './scheduled.jos';
 require("dotenv").config();
 
-
 class Server {
 
     private app: express.Application;

@@ -11,16 +11,14 @@ export class SlackController {
         this.routes();
     }
     
-
     public requestMatchLogging(req: Request, res: Response) {
-        
-        let userID: string = req.body.user_id;
-        let currentDate = new Date();
+        const userID: string = req.body.user_id;
+        const currentDate = new Date();
         // transforms the date into a string with the format yyyy-mm-dd
-        let dateString = currentDate.toISOString().split('T')[0];
+        const dateString = currentDate.toISOString().split('T')[0];
 
         slackClient.chat.postEphemeral({
-            channel: '#tischtennis',
+            channel: process.env.CHANNEL ?? "",
             text: "Submit Match",
             user: userID,
             blocks: [
@@ -29,7 +27,7 @@ export class SlackController {
                     "block_id": "date_section",
                     "text": {
                         "type": "mrkdwn",
-                        "text": "Wann hat das Spiel stattgefunden?"
+                        "text": "When did the game take place?"
                     },
                     "accessory": {
                         "type": "datepicker",
@@ -37,7 +35,7 @@ export class SlackController {
                         "initial_date": dateString,
                         "placeholder": {
                             "type": "plain_text",
-                            "text": "Wähle ein Datum aus"
+                            "text": "Pick a date"
                         }
                     }
                 },
@@ -46,13 +44,13 @@ export class SlackController {
                     "block_id": "player_1_section",
                     "text": {
                         "type": "mrkdwn",
-                        "text": "Spieler 1"
+                        "text": "Player 1"
                     },
                     "accessory": {
                         "type": "users_select",
                         "placeholder": {
                             "type": "plain_text",
-                            "text": "Wähle einen Spieler aus!",
+                            "text": "Select a player!",
                             "emoji": true
                         },
                         "action_id": "first_player_select-action"
@@ -67,7 +65,7 @@ export class SlackController {
                     },
                     "label": {
                         "type": "plain_text",
-                        "text": "Spieler 1 Score",
+                        "text": "Player 1 Score",
                         "emoji": true
                     }
                 },
@@ -79,13 +77,13 @@ export class SlackController {
                     "block_id": "player_2_section",
                     "text": {
                         "type": "mrkdwn",
-                        "text": "Spieler 2"
+                        "text": "Player 2"
                     },
                     "accessory": {
                         "type": "users_select",
                         "placeholder": {
                             "type": "plain_text",
-                            "text": "Wähle einen Spieler aus!",
+                            "text": "Select a player!",
                             "emoji": true
                         },
                         "action_id": "second_player_select-action"
@@ -100,7 +98,7 @@ export class SlackController {
                     },
                     "label": {
                         "type": "plain_text",
-                        "text": "Spieler 2 Score",
+                        "text": "Player 2 Score",
                         "emoji": true
                     }
                 },
@@ -112,7 +110,7 @@ export class SlackController {
                         "type": "button",
                         "text": {
                             "type": "plain_text",
-                            "text": "Abschicken!"
+                            "text": "Submit!"
                         },
                         "value": "submit",
                         "style": "primary",
@@ -122,30 +120,27 @@ export class SlackController {
                         "type": "button",
                         "text": {
                             "type": "plain_text",
-                            "text": "Abbrechen!"
+                            "text": "Cancel!"
                         },
                         "value": "cancel",
                         "style": "danger",
                         "action_id": "cancel_button"
                       }
                     ]
-                  }
+                }
             ]
         });
 
         res.send();
     }
 
-
-    public async requestRanking(req: Request, resp: Response) {
+    public async requestRanking(_req: Request, resp: Response) {
         await postRankingMessage();
         resp.send();
     }
-
 
     public routes() {
         this.router.post('/requestLogging', this.requestMatchLogging);
         this.router.post('/requestRanking', this.requestRanking);
     }
-
 }
